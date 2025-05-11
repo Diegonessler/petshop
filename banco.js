@@ -6,10 +6,11 @@ async function conectarBD() {
     }
 
     const conexao = await mysql.createConnection({
-        host: 'localhost',
-        user: 'root',
-        password: '',
-        database: 'petmimado'
+         host: 'containers-us-west-180.railway.app', // RAILWAY_TCP_PROXY_DOMAIN
+        port: 6392, // RAILWAY_TCP_PROXY_PORT
+        user: 'root', // MYSQLUSER
+        password: 'QomLcwHhqNtkmoszqyJaORekXZXBMEZC', // MYSQL_ROOT_PASSWORD
+        database: 'railway' // MYSQL_DATABASE
     });
 
     global.conexao = conexao;

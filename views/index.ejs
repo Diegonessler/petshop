@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+  </body>
+</html>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Cadastro de Clientes</title>
+</head>
+<body>
+    <header>
+        <div id="title">
+            <h1>Cadastro</h1>
+        </div>
+        <ul>
+            <a href="/pesquisar"><li>Pesquisar</li></a>
+        </ul>
+    </header>
+  
+    <main>
+        <aside>
+            <% if (mensagem) { %>
+                <div class="alert-message">
+                  <p><%= mensagem %></p>
+                </div>
+              <% } %>
+          <form method="POST" action="/cadastro">
+            <input type="text" name="nome" placeholder="Nome" required>
+            <input type="email" name="email" placeholder="E-mail" required>
+            <input type="text" name="telefone" placeholder="Telefone">
+            <input type="text" name="cpf" placeholder="CPF" required>
+            <input type="text" name="endereco" placeholder="Endereço">
+            <input type="text" name="animal" placeholder="Animal">
+            <input type="text" name="raca" placeholder="Raça">
+            <input type="text" name="valor" placeholder="Valor">
+            <textarea name="observacao" placeholder="Observação"></textarea>
+            
+            <label>
+                <input type="checkbox" name="e_plano" value="1">
+                PLANO
+            </label>
+        
+            <input type="submit" value="Enviar">
+        </form>
+        </aside>
+        <article style="padding: 0 0 0 45px;">
+            <img src="/images/imgpet.jpeg" alt="Cachorro com osso">
+        </article>
+    </main>
+</body>
+</html>

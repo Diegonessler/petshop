@@ -13,6 +13,7 @@
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1",
     "mysql2": "^3.14.1",
+    "pg": "^8.16.0",
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {

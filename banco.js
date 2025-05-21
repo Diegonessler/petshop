@@ -1,28 +1,23 @@
-const mysql = require('mysql2/promise');
+const { Pool } = require('pg');
 
-async function conectarBD() {
-    if (global.conexao && global.conexao.state !== 'disconnected') {
-        return global.conexao;
-    }
+// Conexão com PostgreSQL Render
+const pool = new Pool({
+    user: 'bancodb_66mg_user',
+    host: 'dpg-d0m8u9gdl3ps73c5aar0-a.oregon-postgres.render.com',
+    database: 'bancodb_66mg',
+    password: 'CcKDGEnBAqIkMyvHLQTu6OJJPBbhy2Ka',
+    port: 5432,
+    ssl: { rejectUnauthorized: false } // importante para Render
+});
 
-    const conexao = await mysql.createConnection({
-        host: 'localhost',
-        user: 'root',
-        password: '',
-        database: 'petmimado'
-    });
-
-    global.conexao = conexao;
-    return global.conexao;
-}
-
+// Cadastrar cliente
 async function cadastrarCliente(cliente) {
-    const conexao = await conectarBD();
     const sql = `
         INSERT INTO clientes (nome, email, telefone, cpf, endereco, animal, raca, valor, observacao, e_plano)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        RETURNING *;
     `;
-    const [resultado] = await conexao.query(sql, [
+    const values = [
         cliente.nome,
         cliente.email,
         cliente.telefone,
@@ -33,38 +28,40 @@ async function cadastrarCliente(cliente) {
         cliente.valor,
         cliente.observacao,
         cliente.e_plano
-    ]);
-    return resultado;
+    ];
+
+    const res = await pool.query(sql, values);
+    return res.rows[0];
 }
 
+// Listar clientes (com ou sem busca)
 async function listarClientes(search = '') {
-    const conexao = await conectarBD();
     let sql = 'SELECT * FROM clientes';
-    let params = [];
+    let values = [];
 
     if (search) {
-        sql += ' WHERE nome LIKE ? OR email LIKE ?';
-        params = [`%${search}%`, `%${search}%`];
+        sql += ' WHERE nome ILIKE $1 OR email ILIKE $2';
+        values = [`%${search}%`, `%${search}%`];
     }
 
-    const [rows] = await conexao.query(sql, params);
-    return rows;
+    const res = await pool.query(sql, values);
+    return res.rows;
 }
 
+// Deletar cliente por ID
 async function deletarCliente(id) {
-    const conexao = await conectarBD(); // Conectar ao banco de dados
-    await conexao.query('DELETE FROM clientes WHERE id = ?', [id]); // Executar o comando DELETE
+    await pool.query('DELETE FROM clientes WHERE id = $1', [id]);
 }
 
+// Buscar cliente por CPF
 async function buscarClientePorCpf(cpf) {
-    const conexao = await conectarBD();  // Use a função conectarBD
-    try {
-        const [resultado] = await conexao.query('SELECT * FROM clientes WHERE cpf = ?', [cpf]);
-        return resultado.length > 0 ? resultado[0] : null;  // Retorna o cliente se encontrado, caso contrário retorna null
-    } catch (err) {
-        console.error('Erro ao buscar cliente por CPF:', err.message);
-        throw err;  // Lança o erro para ser tratado na rota
-    }
+    const res = await pool.query('SELECT * FROM clientes WHERE cpf = $1', [cpf]);
+    return res.rows.length > 0 ? res.rows[0] : null;
 }
 
-module.exports = { cadastrarCliente, listarClientes, deletarCliente, buscarClientePorCpf };
+module.exports = {
+    cadastrarCliente,
+    listarClientes,
+    deletarCliente,
+    buscarClientePorCpf
+};
